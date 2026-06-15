@@ -11,7 +11,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:lastest
+        image: mariadb:latest
         env:
           MARIADB_ROOT_PASSWORD: toor
           MARIADB_DATABASE: base
