@@ -1,0 +1,6 @@
+# mapping.yml
+# À placer à la racine de chaque repo de ton orga source.
+# Liste simplement les écoles qui doivent recevoir CE repo.
+# Exemple ici : le repo "mathematiques" est envoyé vers ecole-A et ecole-C.
+
+ecoles:
