@@ -1,0 +1,64 @@
+name: 01-1 - Integration - TEST
+
+on: workflow_call
+
+jobs:
+  Backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      mariadb:
+        image: mariadb:lastest
+        env:
+          MARIADB_ROOT_PASSWORD: toor
+          MARIADB_DATABASE: base
+          MARIADB_USER: roger
+          MARIADB_PASSWORD: regor
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      BDD_HOST: 127.0.0.1
+      BDD_NAME: base
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Database check
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port 3306 -u root -ptoor -e "SHOW DATABASES"
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Init bdd
+        run: npm run initbdd
+
+      - name: Populate bdd
+        run: |
+          mysql -u root -ptoor --host 127.0.0.1 --port 3306 --database base < ./test/insert_test_user.sql
+
+      - name: Run tests and generate coverage report
+        run: npm run test:cov
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: back-coverage-report
+          path: backend/coverage/
+          retention-days: 1
