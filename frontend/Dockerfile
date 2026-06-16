@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:26-alpine3.23 as build
 
 ARG MODE=""
 
