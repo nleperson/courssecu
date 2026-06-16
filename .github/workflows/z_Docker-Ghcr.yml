@@ -1,0 +1,46 @@
+name: Z - Delivery - Docker Ghcr
+
+on:
+  workflow_call:
+    inputs:
+      docker-mode:
+        required: false
+        type: string
+        default: ""
+
+env:
+  REGISTRY: ghcr.io
+  USERNAME: ${{ github.actor }}
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  Build-Push-Docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Registry login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Downcase Image Name
+        run: echo "IMAGE_NAME_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Back Build Push
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}-back:${{inputs.docker-mode}}
+
+      - name: Front Build Push
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}-front:${{inputs.docker-mode}}
+          build-args: MODE=:canary

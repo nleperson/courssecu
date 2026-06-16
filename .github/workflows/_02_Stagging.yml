@@ -1,0 +1,21 @@
+name: 02 - Stagging
+
+on:
+  push:
+    branches:
+      - develop
+      - release/*
+
+jobs:
+  Display_Data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display Data
+        run: env | sort
+
+  Build_Push_Docker:
+    if: ${{github.ref_name == 'develop'}}
+    uses: ./.github/workflows/z_Docker-Ghcr.yml
+    secrets: inherit
+    with:
+      docker-mode: canary
