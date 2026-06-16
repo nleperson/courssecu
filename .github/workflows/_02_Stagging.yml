@@ -25,8 +25,6 @@ jobs:
   #   uses: ./.github/workflows/02-2_TrivyScan.yml
   #   secrets: inherit
 
-  #---------------------------------------------------
-
   Deploy:
     uses: ./.github/workflows/02-3_Deploy.yml
     secrets: inherit
